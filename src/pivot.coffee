@@ -10,7 +10,7 @@ callWithJQuery = (pivotModule) ->
 callWithJQuery ($) ->
 
     ###
-    Utilities
+    Utilities test
     ###
 
     addSeparators = (nStr, thousandsSep, decimalSep) ->

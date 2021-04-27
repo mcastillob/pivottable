@@ -16,6 +16,8 @@ callWithJQuery ($) ->
     frFmtPct = nf(digitsAfterDecimal: 1, scaler: 100, suffix: "%", thousandsSep: " ", decimalSep: ",")
 
 
+
+
     $.pivotUtilities.locales.es = 
 
         localeStrings:

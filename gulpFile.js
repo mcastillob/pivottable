@@ -13,6 +13,7 @@ const sourcemaps = require('gulp-sourcemaps');
 const concat = require('gulp-concat');
 const minifyCSS = require('gulp-minify-css');
 const serve = require('gulp-serve');
+const browserSync = require('browser-sync').create();
 
 function clean(cb) {
   // body omitted
@@ -63,6 +64,18 @@ function makeJs() {
   
 }
 
+function browser_sync(){
+
+  
+  browserSync.init({
+    server: {
+        baseDir: "./"
+    }
+});
+
+ 
+
+}
 
 const watcher = gulp.watch(['./src/*.coffee', './locales/*.coffee', './tests/*.coffee','./dist/pivot.css']);
 
@@ -80,5 +93,8 @@ const watcher = gulp.watch(['./src/*.coffee', './locales/*.coffee', './tests/*.c
     console.log('unlink');
     makeJs();
   });
+
+ 
+exports.watch = gulp.parallel(makeJs,browser_sync);
 
 exports.default = gulp.series(clean, gulp.parallel(Css, Js));

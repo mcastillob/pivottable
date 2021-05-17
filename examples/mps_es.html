@@ -9,6 +9,7 @@
         <!-- PivotTable.js libs from ../dist -->
         <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
         <script type="text/javascript" src="../dist/pivot.js"></script>
+        <script type="text/javascript" src="../dist/pivot.es.js"></script>
         <style>
             body {font-family: Verdana;}
         </style>
@@ -21,30 +22,15 @@
     </head>
     <body>
         <script type="text/javascript">
-    // This example shows custom aggregators and sorters using
-    // the "Canadian Parliament 2012" dataset.
+    // This example shows French localization
+    // using the "Canadian Parliament 2012" dataset.
 
     $(function(){
-        var tpl = $.pivotUtilities.aggregatorTemplates;
-
         $.getJSON("mps.json", function(mps) {
-            $("#output").pivotUI(mps, {
-                rows: ["Province"], cols: ["Party"],
-                legend:false,
-                aggregators: {
-                    "Number of MPs":      function() { return tpl.count()() },
-                    "Average Age of MPs": function() { return tpl.average()(["Age"])}
-                },
-                sorters: {
-                    Province: $.pivotUtilities.sortAs(
-                            ["British Columbia", "Alberta",
-                            "Saskatchewan", "Manitoba",
-                            "Territories", "Ontario", "Quebec",
-                            "New Brunswick", "Prince Edward Island",
-                            "Nova Scotia", "Newfoundland and Labrador"]),
-                    Age: function(a,b){ return b-a; } //sort backwards
-                }
-            });
+            $("#output").pivotUI(mps,
+                { rows: ["Province"], cols: ["Party"] },
+                false, "es"
+            );
         });
      });
         </script>

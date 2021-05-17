@@ -453,7 +453,7 @@
           filterResults: "Filter values",
           apply: "Apply",
           cancel: "Cancel",
-          totals: "Totals",
+          totals: "Total",
           vs: "vs",
           by: "by"
         }
@@ -658,6 +658,7 @@
         this.colTotals = {};
         this.allTotal = this.aggregator(this, [], []);
         this.sorted = false;
+        this.legend = opts.legend;
         PivotData.forEachRecord(this.input, this.derivedAttributes, (function(_this) {
           return function(record) {
             if (_this.filter(record)) {
@@ -910,7 +911,7 @@
     Default Renderer for hierarchical table layout
      */
     pivotTableRenderer = function(pivotData, opts) {
-      var aggregator, c, colAttrs, colKey, colKeys, defaults, getClickHandler, i, j, r, result, rowAttrs, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
+      var aggregator, c, colAttrs, colKey, colKeys, defaults, getClickHandler, i, j, legend, r, result, rowAttrs, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
       defaults = {
         table: {
           clickCallback: null,
@@ -918,7 +919,7 @@
           colTotals: true
         },
         localeStrings: {
-          totals: "Totals"
+          totals: "Total"
         }
       };
       opts = $.extend(true, {}, defaults, opts);
@@ -926,6 +927,7 @@
       rowAttrs = pivotData.rowAttrs;
       rowKeys = pivotData.getRowKeys();
       colKeys = pivotData.getColKeys();
+      legend = pivotData.legend;
       if (opts.table.clickCallback) {
         getClickHandler = function(value, rowValues, colValues) {
           var attr, filters, i;
@@ -984,16 +986,24 @@
         if (!hasProp.call(colAttrs, j)) continue;
         c = colAttrs[j];
         tr = document.createElement("tr");
-        if (parseInt(j) === 0 && rowAttrs.length !== 0) {
+        if (legend === true && parseInt(j) === 0 && rowAttrs.length !== 0) {
           th = document.createElement("th");
           th.setAttribute("colspan", rowAttrs.length);
           th.setAttribute("rowspan", colAttrs.length);
           tr.appendChild(th);
         }
-        th = document.createElement("th");
-        th.className = "pvtAxisLabel";
-        th.textContent = c;
-        tr.appendChild(th);
+        if (legend === false && parseInt(j) === 0 && rowAttrs.length !== 0) {
+          th = document.createElement("th");
+          th.setAttribute("colspan", rowAttrs.length + 1);
+          th.setAttribute("rowspan", colAttrs.length + 1);
+          tr.appendChild(th);
+        }
+        if (legend) {
+          th = document.createElement("th");
+          th.className = "pvtAxisLabel";
+          th.textContent = c;
+          tr.appendChild(th);
+        }
         for (i in colKeys) {
           if (!hasProp.call(colKeys, i)) continue;
           colKey = colKeys[i];
@@ -1011,14 +1021,14 @@
         }
         if (parseInt(j) === 0 && opts.table.rowTotals) {
           th = document.createElement("th");
-          th.className = "pvtTotalLabel pvtRowTotalLabel";
+          th.className = "pvtTotalLabel pvtRowTotalLabel rowpv";
           th.innerHTML = opts.localeStrings.totals;
           th.setAttribute("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1));
           tr.appendChild(th);
         }
         thead.appendChild(tr);
       }
-      if (rowAttrs.length !== 0) {
+      if (rowAttrs.length !== 0 && legend === true) {
         tr = document.createElement("tr");
         for (i in rowAttrs) {
           if (!hasProp.call(rowAttrs, i)) continue;
@@ -1030,7 +1040,7 @@
         }
         th = document.createElement("th");
         if (colAttrs.length === 0) {
-          th.className = "pvtTotalLabel pvtRowTotalLabel";
+          th.className = "pvtTotalLabel pvtRowTotalLabel rowpv";
           th.innerHTML = opts.localeStrings.totals;
         }
         tr.appendChild(th);
@@ -1090,7 +1100,7 @@
         tr = document.createElement("tr");
         if (opts.table.colTotals || rowAttrs.length === 0) {
           th = document.createElement("th");
-          th.className = "pvtTotalLabel pvtColTotalLabel";
+          th.className = "pvtTotalLabel pvtColTotalLabel colpv";
           th.innerHTML = opts.localeStrings.totals;
           th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
           tr.appendChild(th);
@@ -1155,7 +1165,8 @@
         aggregatorName: "Count",
         sorters: {},
         derivedAttributes: {},
-        renderer: pivotTableRenderer
+        renderer: pivotTableRenderer,
+        legend: true
       };
       localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings);
       localeDefaults = {
@@ -1228,7 +1239,8 @@
         filter: function() {
           return true;
         },
-        sorters: {}
+        sorters: {},
+        legend: true
       };
       localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings);
       localeDefaults = {
@@ -1553,7 +1565,8 @@
               sorters: opts.sorters,
               cols: [],
               rows: [],
-              dataClass: opts.dataClass
+              dataClass: opts.dataClass,
+              legend: opts.legend
             };
             numInputsToProcess = (ref4 = opts.aggregators[aggregator.val()]([])().numInputs) != null ? ref4 : 0;
             vals = [];

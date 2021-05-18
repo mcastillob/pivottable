@@ -919,7 +919,9 @@
           colTotals: true
         },
         localeStrings: {
-          totals: "Total"
+          totals: "Total",
+          totalsRow: "Total",
+          totalsCol: "Total"
         }
       };
       opts = $.extend(true, {}, defaults, opts);
@@ -995,7 +997,8 @@
         if (legend === false && parseInt(j) === 0 && rowAttrs.length !== 0) {
           th = document.createElement("th");
           th.setAttribute("colspan", rowAttrs.length + 1);
-          th.setAttribute("rowspan", colAttrs.length + 1);
+          th.setAttribute("rowspan", colAttrs.length);
+          th.innerHTML = "&nbsp;";
           tr.appendChild(th);
         }
         if (legend) {
@@ -1022,7 +1025,7 @@
         if (parseInt(j) === 0 && opts.table.rowTotals) {
           th = document.createElement("th");
           th.className = "pvtTotalLabel pvtRowTotalLabel rowpv";
-          th.innerHTML = opts.localeStrings.totals;
+          th.innerHTML = opts.localeStrings.totalsRow;
           th.setAttribute("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1));
           tr.appendChild(th);
         }
@@ -1041,9 +1044,27 @@
         th = document.createElement("th");
         if (colAttrs.length === 0) {
           th.className = "pvtTotalLabel pvtRowTotalLabel rowpv";
-          th.innerHTML = opts.localeStrings.totals;
+          th.innerHTML = opts.localeStrings.totalsRow;
         }
         tr.appendChild(th);
+        thead.appendChild(tr);
+      }
+      result.appendChild(thead);
+      if (rowAttrs.length !== 0 && legend === false) {
+        tr = document.createElement("tr");
+        for (i in rowAttrs) {
+          if (!hasProp.call(rowAttrs, i)) continue;
+          r = rowAttrs[i];
+          th = document.createElement("th");
+          th.className = "pvtAxisLabel";
+          th.textContent = r;
+          tr.appendChild(th);
+        }
+        th = document.createElement("th");
+        if (colAttrs.length === 0) {
+          th.className = "pvtTotalLabel pvtRowTotalLabel rowpv";
+          th.innerHTML = opts.localeStrings.totalsRow;
+        }
         thead.appendChild(tr);
       }
       result.appendChild(thead);
@@ -1101,7 +1122,7 @@
         if (opts.table.colTotals || rowAttrs.length === 0) {
           th = document.createElement("th");
           th.className = "pvtTotalLabel pvtColTotalLabel colpv";
-          th.innerHTML = opts.localeStrings.totals;
+          th.innerHTML = opts.localeStrings.totalsCol;
           th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
           tr.appendChild(th);
         }
@@ -1176,6 +1197,11 @@
         localeStrings: localeStrings
       };
       opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts));
+      if (inputOpts.totalsLabel != null) {
+        opts.rendererOptions = $.extend(true, opts.rendererOptions, {
+          localeStrings: inputOpts.totalsLabel
+        });
+      }
       result = null;
       try {
         pivotData = new opts.dataClass(input, opts);

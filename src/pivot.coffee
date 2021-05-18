@@ -321,6 +321,8 @@ callWithJQuery ($) ->
             @allTotal = @aggregator(this, [], [])
             @sorted = false
             @legend =  opts.legend
+         
+
 
             # iterate through input, accumulating data for cells
             PivotData.forEachRecord @input, @derivedAttributes, (record) =>
@@ -450,7 +452,10 @@ callWithJQuery ($) ->
                 clickCallback: null
                 rowTotals: true
                 colTotals: true
-            localeStrings: totals: "Total"
+            localeStrings:
+                     totals: "Total"
+                     totalsRow: "Total"
+                     totalsCol: "Total"
 
         opts = $.extend(true, {}, defaults, opts)
 
@@ -502,7 +507,9 @@ callWithJQuery ($) ->
             if legend==false and parseInt(j) == 0 and rowAttrs.length != 0
                 th = document.createElement("th")
                 th.setAttribute("colspan", rowAttrs.length+1)
-                th.setAttribute("rowspan", colAttrs.length+1)
+                th.setAttribute("rowspan", colAttrs.length)
+                th.innerHTML  = "&nbsp;"
+              
                 tr.appendChild th
 
             if legend
@@ -523,7 +530,7 @@ callWithJQuery ($) ->
             if parseInt(j) == 0 && opts.table.rowTotals
                 th = document.createElement("th")
                 th.className = "pvtTotalLabel pvtRowTotalLabel rowpv"
-                th.innerHTML = opts.localeStrings.totals
+                th.innerHTML = opts.localeStrings.totalsRow
                 th.setAttribute("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
                 tr.appendChild th
             thead.appendChild tr
@@ -539,8 +546,23 @@ callWithJQuery ($) ->
             th = document.createElement("th")
             if colAttrs.length ==0
                 th.className = "pvtTotalLabel pvtRowTotalLabel rowpv"
-                th.innerHTML = opts.localeStrings.totals
+                th.innerHTML = opts.localeStrings.totalsRow
             tr.appendChild th
+            thead.appendChild tr
+        result.appendChild thead
+
+        if rowAttrs.length !=0 and legend==false
+            tr = document.createElement("tr")
+            for own i, r of rowAttrs
+                th = document.createElement("th")
+                th.className = "pvtAxisLabel"
+                th.textContent = r
+                tr.appendChild th
+            th = document.createElement("th")
+            if colAttrs.length ==0
+                th.className = "pvtTotalLabel pvtRowTotalLabel rowpv"
+                th.innerHTML = opts.localeStrings.totalsRow
+           
             thead.appendChild tr
         result.appendChild thead
 
@@ -588,7 +610,7 @@ callWithJQuery ($) ->
             if opts.table.colTotals || rowAttrs.length == 0
                 th = document.createElement("th")
                 th.className = "pvtTotalLabel pvtColTotalLabel colpv"
-                th.innerHTML = opts.localeStrings.totals
+                th.innerHTML = opts.localeStrings.totalsCol
                 th.setAttribute("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
                 tr.appendChild th
             for own j, colKey of colKeys
@@ -645,6 +667,10 @@ callWithJQuery ($) ->
             localeStrings: localeStrings
 
         opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts))
+        
+        if inputOpts.totalsLabel? 
+            opts.rendererOptions =  $.extend(true, opts.rendererOptions,{localeStrings:inputOpts.totalsLabel} )
+
 
         result = null
         try
